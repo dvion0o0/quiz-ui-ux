@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { FiSettings } from "react-icons/fi";
-import { FcPrevious } from "react-icons/all";
+import { MdPerson } from "react-icons/md";
 
 function App() {
   const [open, setOpen] = useState(false);
   return (
     <>
       <div className="quiz-center">
-        <FiSettings className="section-open" onClick={() => setOpen(!open)} />
+        <MdPerson className="section-open" onClick={() => setOpen(!open)} />
         <div className="quiz-title">
           <h3>Quiz title goes here</h3>
         </div>
@@ -26,11 +26,11 @@ function App() {
             {/* quiz-question-container */}
             <div className="quiz-question-container">
               <div className="quiz-question">
-                <h3>
+                <h4>
                   <span>Q 12. </span> Lorem ipsum dolor sit amet, consectetur
                   adipiscing elit, sed do eiusm tempor incididunt ut labore et
                   dolore magna aliqua?
-                </h3>
+                </h4>
                 <div className="question-image-container">
                   <h2>REFERENCE IMAGE</h2>
                 </div>
@@ -70,19 +70,28 @@ function App() {
                 </label>
               </div>
             </div>
+            <div className="mobile-button-container">
+              <button className="mobile-btn quiz-btn">Previous</button>
+              <button className="mobile-btn quiz-btn">Next</button>
+            </div>
           </div>
           <div className="question-section-container">
-            <div className="timer-container">
-              <h4>TIME STATUS</h4>
-              <div className="timer">
-                <div className="present-time">
-                  <div className="progress-bar"></div>
-                  <h2>00 : 15 : 24</h2>
+            <div className="time_profile-container">
+              <div className="timer-container">
+                <h4>TIME LEFT</h4>
+                <div className="timer">
+                  <div className="present-time">
+                    <div className="progress-bar"></div>
+                    <h2>00 : 15 : 24</h2>
+                  </div>
                 </div>
-                <div className="total-time">
-                  <h3>Total Time</h3>
-                  <h3>01 : 00 : 00</h3>
+              </div>
+              <div className="profile-container">
+                <div className="img">
+                  <MdPerson className="author" />
                 </div>
+                <h5>lorem ipsum</h5>
+                <h5>loremipsum@xyz.com</h5>
               </div>
             </div>
             <div

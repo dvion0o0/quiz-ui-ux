@@ -1,13 +1,21 @@
 import React, { useState } from "react";
-import { FiSettings } from "react-icons/fi";
 import { MdPerson } from "react-icons/md";
+import { IoMdHelp } from "react-icons/io";
 
 function App() {
-  const [open, setOpen] = useState(false);
+  const [authorOpen, setAuthorOpen] = useState(false);
+  const [sectionOpen, setSectionOpen] = useState(false);
   return (
     <>
       <div className="quiz-center">
-        <MdPerson className="section-open" onClick={() => setOpen(!open)} />
+        <MdPerson
+          className="section-open"
+          onClick={() => setAuthorOpen(!authorOpen)}
+        />
+        <IoMdHelp
+          className="section-open help"
+          onClick={() => setSectionOpen(!sectionOpen)}
+        />
         <div className="quiz-title">
           <h3>Quiz title goes here</h3>
         </div>
@@ -86,7 +94,13 @@ function App() {
                   </div>
                 </div>
               </div>
-              <div className="profile-container">
+              <div
+                className={`${
+                  authorOpen
+                    ? "profile-container profile-container-1"
+                    : "profile-container"
+                }`}
+              >
                 <div className="img">
                   <MdPerson className="author" />
                 </div>
@@ -96,7 +110,7 @@ function App() {
             </div>
             <div
               className={`${
-                open
+                sectionOpen
                   ? "question-section question-section-1"
                   : "question-section"
               }`}
@@ -137,10 +151,13 @@ function App() {
                   <button className="btn">25</button>
                 </div>
               </div>
+              {/* <div className="marked-btn-container">
+                <button className="marked tab">Marked for Review</button>
+              </div> */}
             </div>
             <div
               className={`${
-                open
+                sectionOpen
                   ? "question-tab-container question-tab-container-1"
                   : "question-tab-container"
               }`}

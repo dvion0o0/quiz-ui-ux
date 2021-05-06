@@ -2,18 +2,10 @@ import React, { useState, useEffect } from "react";
 import { MdPerson } from "react-icons/md";
 import { IoMdHelp } from "react-icons/io";
 import { useGlobalContext } from "./context";
-// import data from "./newData";
-import sectionData from "./sectionsData";
+import axios from "axios";
 
 function Quiz() {
-  const {
-    data,
-    loading,
-    quiz_time,
-    quiz_name,
-    quiz_questions,
-    fetchQuestions,
-  } = useGlobalContext();
+  const { loading, quiz_time, quiz_name, quiz_questions } = useGlobalContext();
 
   const [authorOpen, setAuthorOpen] = useState(false);
   const [sectionOpen, setSectionOpen] = useState(false);
@@ -24,9 +16,21 @@ function Quiz() {
   const [totalTime, setTotalTime] = useState(
     JSON.parse(localStorage.getItem("TIME"))
   );
+  const [second, setSecond] = useState(60);
+
   const [quizData, setQuizData] = useState(
     JSON.parse(localStorage.getItem("DATA"))
   );
+  const [data, setData] = useState(
+    JSON.parse(localStorage.getItem("QUIZ_DATA"))
+  );
+
+  const [answerSelectID, setAnswerSelectID] = useState(-1);
+  const [selectedAnswers, setSelectedAnswers] = useState([]);
+  const [finalValues, setFinalValues] = useState({
+    quiz_name: data.quiz_name,
+    quiz_id: data.quiz_id,
+  });
 
   // const filterSections = data.quiz_all_question.filter(
   //   (item) => item.question_section_name === "section 1"
@@ -86,9 +90,56 @@ function Quiz() {
     });
   }, [timeElapsed]);
 
-  const handleChange = (e, index) => {
-    e.currentTarget.checked = true;
+  useEffect(() => {
+    const sec = setInterval(() => setSecond(second - 1), 1000);
+    return () => clearInterval(sec);
+  }, [second]);
+
+  useEffect(() => {
+    if (second < 0) {
+      setSecond(60);
+    }
+  }, [second]);
+
+  const handleSelectAnswer = (e, index, item) => {
+    setAnswerSelectID(index);
+    setSelectedAnswers([
+      ...selectedAnswers,
+      {
+        question_id: quizData[questionIndex].question_body,
+        selectedAnswers: e.currentTarget.value,
+      },
+    ]);
   };
+
+  useEffect(() => {
+    setAnswerSelectID(-1);
+  }, [questionIndex]);
+
+  const finalSubmit = async () => {
+    console.log(finalValues);
+    try {
+      const submit = await axios.post(
+        "http://localhost:4003/submitQuiz",
+        JSON.stringify(finalValues)
+      );
+      console.log(submit);
+    } catch (error) {
+      console.log(Error);
+    }
+  };
+
+  useEffect(() => {
+    setFinalValues({
+      ...finalValues,
+      answers: selectedAnswers,
+      remaining_time: `${totalTime}:${second}`,
+    });
+  }, [selectedAnswers]);
+
+  if (!quizData) {
+    return <h1>Loading...</h1>;
+  }
 
   return (
     <>
@@ -118,16 +169,23 @@ function Quiz() {
                   <span>{quizData.length}</span>
                 </h4>
               </div>
-              <button className="quiz-btn" onClick={nextButton}>
-                Next
-              </button>
+              {quizData.length - 1 === questionIndex ? (
+                <button className="quiz-btn" onClick={() => finalSubmit()}>
+                  Submit
+                </button>
+              ) : (
+                <button className="quiz-btn" onClick={nextButton}>
+                  Next
+                </button>
+              )}
             </div>
             {/* quiz-question-container */}
+
             <div className="quiz-question-container">
               <div className="quiz-question">
                 <h4>
                   <span>Q {questionIndex + 1}. </span>
-                  {quizData[questionIndex].question_body}
+                  {quizData && quizData[questionIndex].question_body}
                 </h4>
                 {quizData[questionIndex].question_body_img_url && (
                   <div className="question-image-container">
@@ -135,23 +193,28 @@ function Quiz() {
                   </div>
                 )}
               </div>
-              <div className="quiz-options">
+              <div className="quiz-options option-container">
                 {quizData[questionIndex].question_options.map((item, index) => {
                   return (
-                    <label class="container">
-                      {item.option_body}
-                      <input
-                        type="radio"
-                        name="radio"
-                        onChange={(e) => handleChange(e, index)}
-                      />
-                      <span class="checkmark"></span>
+                    <div class="option-container">
+                      <button
+                        className={`${
+                          index === answerSelectID
+                            ? "option-btn option-btn-active"
+                            : "option-btn"
+                        }`}
+                        key={index}
+                        value={item.option_body}
+                        onClick={(e) => handleSelectAnswer(e, index)}
+                      >
+                        {item.option_body}
+                      </button>
                       {item.option_body_img && (
                         <div className="options-image-container">
                           <h2>REFERENCE IMAGE</h2>
                         </div>
                       )}
-                    </label>
+                    </div>
                   );
                 })}
                 {/* <label class="container">
@@ -192,9 +255,18 @@ function Quiz() {
               <button className="mobile-btn quiz-btn" onClick={prevButton}>
                 Previous
               </button>
-              <button className="mobile-btn quiz-btn" onClick={nextButton}>
-                Next
-              </button>
+              {quizData.length - 1 === questionIndex ? (
+                <button
+                  className="mobile-btn quiz-btn"
+                  onClick={() => finalSubmit()}
+                >
+                  Submit
+                </button>
+              ) : (
+                <button className="mobile-btn quiz-btn" onClick={nextButton}>
+                  Next
+                </button>
+              )}
             </div>
           </div>
           <div className="question-section-container">
@@ -204,7 +276,9 @@ function Quiz() {
                 <div className="timer">
                   <div className="present-time">
                     <div className="progress-bar"></div>
-                    <h2>{totalTime}</h2>
+                    <h2>
+                      {totalTime}:{second}
+                    </h2>
                   </div>
                 </div>
               </div>

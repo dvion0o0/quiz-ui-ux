@@ -13,7 +13,7 @@ const AppProvider = ({ children }) => {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:3003/getQuiz/demo");
+      const response = await axios.get("http://localhost:4003/getQuiz/demo");
       console.log(response);
       setData(response.data);
       setQuiz_time(response.data.quiz_timer_time);

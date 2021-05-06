@@ -32,11 +32,18 @@ function Quiz() {
     quiz_id: data.quiz_id,
   });
 
-  // const filterSections = data.quiz_all_question.filter(
-  //   (item) => item.question_section_name === "section 1"
-  // );
+  // creating new object properties
 
-  // console.log(filterSections);
+  const value = quizData.map((item) => ({
+    ...item,
+    Answered: false,
+    marked: false,
+    notAnswered: false,
+    notVisited: true,
+  }));
+  const [sectionStyle, setSectionStyle] = useState(value);
+
+  // handle next and prev buttons
 
   const prevButton = () => {
     setQuestionIndex((oldValue) => {
@@ -46,6 +53,7 @@ function Quiz() {
       }
       return newValue;
     });
+    sectionStyle[questionIndex].notVisited = false;
   };
 
   const nextButton = () => {
@@ -56,17 +64,11 @@ function Quiz() {
       }
       return newValue;
     });
+    sectionStyle[questionIndex].notAnswered = true;
+    sectionStyle[questionIndex].notVisited = false;
   };
 
-  // useEffect(() => {
-  //   if (
-  //     questionIndex ===
-  //     data.quiz_section_info[0].section_all_questions.length - 1
-  //   ) {
-  //     setSectionIndex(1);
-  //     setQuestionIndex(0);
-  //   }
-  // }, [questionIndex]);
+  // timer
 
   useEffect(() => {
     const timer = setInterval(() => setCounter(counter + 1), 1000);
@@ -101,27 +103,32 @@ function Quiz() {
     }
   }, [second]);
 
+  // select answer event
+
   const handleSelectAnswer = (e, index, item) => {
     setAnswerSelectID(index);
     setSelectedAnswers([
       ...selectedAnswers,
       {
-        question_id: quizData[questionIndex].question_body,
+        question_id: quizData[questionIndex].question_id,
         selectedAnswers: e.currentTarget.value,
       },
     ]);
+    sectionStyle[questionIndex].Answered = true;
   };
 
   useEffect(() => {
     setAnswerSelectID(-1);
   }, [questionIndex]);
 
+  // final submission
+
   const finalSubmit = async () => {
     console.log(finalValues);
     try {
       const submit = await axios.post(
         "http://localhost:4003/submitQuiz",
-        JSON.stringify(finalValues)
+        finalValues
       );
       console.log(submit);
     } catch (error) {

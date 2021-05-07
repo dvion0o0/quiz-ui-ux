@@ -112,6 +112,10 @@ function Quiz() {
       {
         question_id: quizData[questionIndex].question_id,
         selectedAnswers: e.currentTarget.value,
+        // Answered: sectionStyle[questionIndex].Answered,
+        // NotAnswered: sectionStyle[questionIndex].notAnswered,
+        // NotVisited: sectionStyle[questionIndex].notVisited,
+        // marked: sectionStyle[questionIndex].marked,
       },
     ]);
     sectionStyle[questionIndex].Answered = true;
@@ -143,6 +147,16 @@ function Quiz() {
       remaining_time: `${totalTime}:${second}`,
     });
   }, [selectedAnswers]);
+
+  const Style = (item) => {
+    if (item.Answered) {
+      return "btn answered";
+    } else if (item.notAnswered) {
+      return "btn not-answered";
+    } else {
+      return "btn";
+    }
+  };
 
   if (!quizData) {
     return <h1>Loading...</h1>;
@@ -313,10 +327,10 @@ function Quiz() {
               <h4>QUESTION SECTION</h4>
               <div className="sections">
                 <div className="btn-container">
-                  {quizData.map((item, index) => {
+                  {sectionStyle.map((item, index) => {
                     return (
                       <button
-                        className="btn"
+                        className={Style(item)}
                         onClick={() => setQuestionIndex(index)}
                       >
                         {index + 1}{" "}
